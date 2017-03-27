@@ -57,8 +57,7 @@
             FROM code
          ";
     $result=$link->query($sql);
-    $row=mysqli_fetch_all($result, MYSQLI_ASSOC);
-
+    $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
     $sn = get_last_no("SN", "code");
 
@@ -136,47 +135,43 @@
     </script>
 
 </head>
-
+<style type="text/css">
+    .not_fill {
+      animation: blink .5s step-end infinite alternate;
+      border-style: solid;
+    }
+    @keyframes blink {
+      50% {
+          border-color: red;
+          border-style: solid;
+      }
+      
+    }
+</style>
 <body class="no-notes collapse-annotation">
     <a name="top"></a>
 
     <main class="row">
         <header class="logo row">
 
-<form method="POST">
-            <div id="rendering-options-top">
-                <button onclick="MakerJsPlayground.toggleClassAndResize('collapse-rendering-options');">自訂 <span class="icon dropup">&#x25B4;</span><span class="icon dropdown">&#x25BE;</span></button>
-            </div>
+            <form method="POST">
+                <div id="rendering-options-top">
+                    <button onclick="MakerJsPlayground.toggleClassAndResize('collapse-rendering-options');">自訂 <span class="icon dropup">&#x25B4;</span><span class="icon dropdown">&#x25BE;</span></button>
+                </div>
 
-            <div class="row cad_tools">
-                <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_line" value="直線" /></div>
-                <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_circle" value="圓形" /></div>
-                <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_arc" value="弧形" /></div>
-                <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_rec" value="矩形" /></div>
-            </div>
-            遊標位置
-            <div class="mouse_position" id="mouse_postition"></div>
-            <div class="tool_detail">
-                <div class="line">
-                    <div class="row "> 原點 X<input id="start_x" /> Y<input id="start_y" /></div>
-                    <div class="row "> 終點 X<input id="end_x" /> Y<input id="end_y" /></div>
-                    <input type="hidden" id="LINE_CONTENT" name="LINE_CONTENT" disabled/>
+                <div class="row cad_tools">
+                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_line" value="直線" /></div>
+                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_circle" value="圓形" /></div>
+                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_arc" value="弧形" /></div>
+                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_rec" value="矩形" /></div>
                 </div>
-                <div class="circle">
-                    <div class="row "> 原點 X<input id="c_start_x" /> Y<input id="c_start_y" /></div>
-                    <div class="row "> 半徑 R<input id="radius" /></div>
-                    <input type="hidden" id="CIRCLE_CONTENT" name="CIRCLE_CONTENT" disabled/>
+                <!-- 遊標位置
+                <div class="mouse_position" id="mouse_postition"></div> -->
+                <div id="tool_detail">
+                    
                 </div>
-                <div class="arc">
-                    <div class="row "> 原點 X<input id="arc_start_x" /> Y<input id="arc_start_y" /></div>
-                    <div class="row "> 半徑 R<input id="arc_radius" /></div>
-                    <div class="row "> 起始角<input id="arc_r_start" /> 結束角<input id="arc_r_end" /></div>
-                    <input type="hidden" id="ARC_CONTENT" name="ARC_CONTENT" disabled/>
-                </div
                 
-            </div>
-            <input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_line();"/>    
-</form> 
+            </form> 
         </header>
 
         <section class="row" id="blueprint-canvas" style="width:device-width">
@@ -202,7 +197,9 @@
             <div id="notes"></div>
         </section>
 
+        <section class="row" id="history" style="width: device-width">
 
+        </section>
 
         <section class="editor row" id="editor">
             <div>
@@ -218,18 +215,19 @@
 var makerjs = require('makerjs');
 var model = {
     paths: {
+
 <?php 
     
     foreach ($row as $key => $value) {
-        # code...
       echo "      ". $row[$key]["CODE"]. PHP_EOL;
-    }
+    } //foreach ($row as $key => $value)
 
 ?>
 
     }
 
 };
+
 if ( !!Object.keys(model.paths).length ) {
     var svg = makerjs.exporter.toSVG(model);
     document.write(svg);
@@ -237,8 +235,7 @@ if ( !!Object.keys(model.paths).length ) {
 
 </pre>
             </div>
-        </section>
-        <!-- section class="editor -->
+        </section><!-- section  class="editor row" id="editor"-->
 
 
 
@@ -248,29 +245,42 @@ if ( !!Object.keys(model.paths).length ) {
         </footer>
 
     </main>
+
     <script>
+        var growbal = growbal || {};
         $("#btn_line").click(function(){
-            $(".line").show();
-            $(".circle").hide();
-            $(".arc").hide();
-            $(".rec").hide();
-            $("#btn_addline").show();
-            $("#btn_addline").attr("onclick", "return add_line();");
+            $("#tool_detail").html(
+                '<div class="line">'+
+                    '<div class="row "> 原點 X<input id="start_x" /> Y<input id="start_y" /></div>'+
+                    '<div class="row "> 終點 X<input id="end_x" /> Y<input id="end_y" /></div>'+
+                    '<input type="hidden" id="LINE_CONTENT" name="LINE_CONTENT" />'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_line();"/>'
+            );
+            
         });
         $("#btn_circle").click(function(){
-            $(".line").hide();
-            $(".circle").show();
-            $(".arc").hide();
-            $(".rec").hide();
-            $("#btn_addline").show();
-            $("#btn_addline").attr("onclick", "return add_circle();");
+            $("#tool_detail").html(
+                '<div class="circle">'+
+                    '<div class="row "> 原點 X<input id="c_start_x" /> Y<input id="c_start_y" /></div>'+
+                    '<div class="row "> 半徑 R<input id="radius" /></div>'+
+                    '<input type="hidden" id="CIRCLE_CONTENT" name="CIRCLE_CONTENT" />'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_circle();"/>'  
+            );
+            
         });
         $("#btn_arc").click(function(){
-            $(".line").hide();
-            $(".circle").hide();
-            $(".arc").show();
-            $(".rec").hide();
-            $("#btn_addline").show();
+            $("#tool_detail").html(
+                '<div class="arc">'+
+                    '<div class="row "> 原點 X<input id="arc_start_x" /> Y<input id="arc_start_y" /></div>'+
+                    '<div class="row "> 半徑 R<input id="arc_radius" /></div>'+
+                    '<div class="row "> 起始角<input id="arc_r_start" /> 結束角<input id="arc_r_end" /></div>'+
+                    '<input type="hidden" id="ARC_CONTENT" name="ARC_CONTENT" />'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_circle();"/>'
+            );
+            
         });
         $("#btn_rec").click(function(){
             $(".line").hide();
@@ -280,32 +290,55 @@ if ( !!Object.keys(model.paths).length ) {
             $("#btn_addline").show();
         });
     </script>
+    <script type="text/javascript">
+    
+        function all_check()
+        {
+            allfill = true;
+            $("#tool_detail").find("input").each(function(){
+                if (!$(this).val()) {
+                    allfill = false;
+                    $(this).addClass("not_fill");
+                            
+                } else {
+                    $(this).removeClass("not_fill");
+                }
+            });
+            
+            return allfill;
+            
+        }
+    </script>
     <script>
-        var growbal={};
+        
         var i = <?php echo $sn;?>;
-        console.log(i);
-        // $("#btn_addline").click(function() {
-        function add_line(){
+        
+        function add_line()
+        {
             
             $("#LINE_CONTENT").val(
                 '"L'+i+'": new makerjs.paths.Line(['+  $("#start_x").val() +','+ $("#start_y").val()+'], ['+
                 $("#end_x").val()+',' + $("#end_y").val()+'] ),'
             );
             $("#LINE_CONTENT").removeAttr("disabled");
-            return true;
+            
+            return all_check();
         };
         
-        function add_circle(){
+        function add_circle()
+        {
             
             $("#CIRCLE_CONTENT").val(
                 '"C'+i+'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
                 $("#radius").val()+' ),'
             );
             $("#CIRCLE_CONTENT").removeAttr("disabled");
-
-            return true;
+           
+            return all_check();
         };
-        function add_arc(){
+
+        function add_arc()
+        {
             
             $("#ARC_CONTENT").val(
                 '"A'+i+'": new makerjs.paths.Arc(['+  $("#arc_start_x").val() +','+ $("#arc_start_y").val()+'], '+
@@ -313,9 +346,11 @@ if ( !!Object.keys(model.paths).length ) {
             );
             $("#ARC_CONTENT").removeAttr("disabled");
             // var arc = new makerjs.paths.Arc([0, 0], 25, 0, 90);
-            return true;
+            return all_check();
         };
-        function add_rec(){
+        
+        function add_rec()
+        {
             
             $("#CIRCLE_CONTENT").val(
                 '"C'+i+'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
@@ -328,7 +363,7 @@ if ( !!Object.keys(model.paths).length ) {
         
         
     </script>
-
+    
     <script type="text/javascript">
         $(function() {
             // $("#editor").hide();
