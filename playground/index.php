@@ -29,10 +29,12 @@
         $sn = get_last_no("SN", "code");
         $sql="INSERT INTO code(
                      SN ,
-                     CODE )
+                     CODE ,
+                     ELEMENT_NAME )
                      VALUES(
                      '".$sn."' ,
-                     '".$_POST["CODE"]."' )
+                     '".$_POST["CODE"]."' ,
+                     '".$_POST["ELEMENT_NAME"]."' )
              ";
 
         $result=$link->query($sql);
@@ -244,10 +246,10 @@ if ( !!Object.keys(model.paths).length ) {
                 '<div class="line">'+
                     '<div class="row "> 原點 X<input id="start_x" /> Y<input id="start_y" /></div>'+
                     '<div class="row "> 終點 X<input id="end_x" /> Y<input id="end_y" /></div>'+
-                    '<input type="hidden" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="直線'+ growbal.SN + '"/>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="直線"/>'+
                 '</div>'+
-                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_line();"/>'
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_line();"/>'
             );
             
         });
@@ -257,10 +259,10 @@ if ( !!Object.keys(model.paths).length ) {
                 '<div class="circle">'+
                     '<div class="row "> 原點 X<input id="c_start_x" /> Y<input id="c_start_y" /></div>'+
                     '<div class="row "> 半徑 R<input id="radius" /></div>'+
-                    '<input type="hidden" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="圓'+ growbal.SN + '/>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="圓"/>'+
                 '</div>'+
-                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_circle();"/>'  
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_circle();"/>'  
             );
             
         });
@@ -271,10 +273,10 @@ if ( !!Object.keys(model.paths).length ) {
                     '<div class="row "> 原點 X<input id="arc_start_x" /> Y<input id="arc_start_y" /></div>'+
                     '<div class="row "> 半徑 R<input id="arc_radius" /></div>'+
                     '<div class="row "> 起始角<input id="arc_r_start" /> 結束角<input id="arc_r_end" /></div>'+
-                    '<input type="hidden" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="圓'+ growbal.SN + '/>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="弧"/>'+
                 '</div>'+
-                '<input type="submit" class="btn btn-danger" id="btn_addline" value="增" onclick="return add_circle();"/>'
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_arc();"/>'
             );
             
         });
@@ -288,7 +290,7 @@ if ( !!Object.keys(model.paths).length ) {
         function add_line()
         {
             
-            $("#LINE_CONTENT").val(
+            $("#CODE").val(
                 '"L'+ growbal.SN +'": new makerjs.paths.Line(['+  $("#start_x").val() +','+ $("#start_y").val()+'], ['+
                 $("#end_x").val()+',' + $("#end_y").val()+'] ),'
             );
@@ -300,7 +302,7 @@ if ( !!Object.keys(model.paths).length ) {
         function add_circle()
         {
             
-            $("#CIRCLE_CONTENT").val(
+            $("#CODE").val(
                 '"C'+ growbal.SN +'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
                 $("#radius").val()+' ),'
             );
@@ -311,83 +313,39 @@ if ( !!Object.keys(model.paths).length ) {
 
         function add_arc()
         {
-            
-            $("#ARC_CONTENT").val(
+            // var arc = new makerjs.paths.Arc([0, 0], 25, 0, 90);
+            $("#CODE").val(
                 '"A'+ growbal.SN +'": new makerjs.paths.Arc(['+  $("#arc_start_x").val() +','+ $("#arc_start_y").val()+'], '+
-                $("#arc_radius").val()+ $("#arc_r_start").val()+','+ $("#arc_r_end").val() +' ),'
+                $("#arc_radius").val()+ ',' + $("#arc_r_start").val()+','+ $("#arc_r_end").val() +' ),'
             );
             
-            // var arc = new makerjs.paths.Arc([0, 0], 25, 0, 90);
+            
             return all_check();
         };
         
-        function add_rec()
-        {
+        // function add_rec()
+        // {
             
-            $("#CIRCLE_CONTENT").val(
-                '"C'+ growbal.SN +'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
-                $("#radius").val()+' ),'
-            );
-            $("#CIRCLE_CONTENT").removeAttr("disabled");
+        //     $("#CODE").val(
+        //         '"C'+ growbal.SN +'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
+        //         $("#radius").val()+' ),'
+        //     );
+        //     $("#CIRCLE_CONTENT").removeAttr("disabled");
 
-            return true;
-        };
+        //     return true;
+        // };
         
         
     </script>
     
     <script type="text/javascript">
         $(function() {
-            // $("#editor").hide();
-            // $(".tool_detail").hide();
-            $(".line").hide();
-            $(".circle").hide();
-            $(".arc").hide();
-            $(".rec").hide();
-            $("#btn_addline").hide();
+            
             $("body").removeClass("side-by-side");
-
             // $("#rendering-options-menu").hide();
         });
-        $("iframe").attr("id", "hi");
     </script>
-    <script type="text/javascript">
-        // var add_from = 6;
-
-        // function add_line() {
-        //     console.log("addalin");
-        //     $(".CodeMirror-code div").eq(add_from).html(
-
-        //         '<div class="CodeMirror-gutter-wrapper" style="left: -30px;">' +
-        //         '<div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">' + add_from + '</div>' +
-        //         '</div>' +
-        //         '<pre class=" CodeMirror-line ">' +
-        //         '<span style="padding-right: 0.1px;">' +
-        //         '<span class="cm-string cm-property">"line' + add_from + '"</span>: ' +
-        //         '<span class="cm-keyword">new</span> ' +
-        //         '<span class="cm-variable">makerjs</span>.' +
-        //         '<span class="cm-property">paths</span>.' +
-        //         '<span class="cm-property">Line</span>([<span class="cm-number">' + $("#start_x").val() + '</span>, <span class="cm-number">' + $("#start_y").val() + '</span>], [<span class="cm-number">' + $("#end_x").val() + '</span>, <span class="cm-number">' + $("#end_y").val() + '</span>]),</span>' +
-        //         '</pre>'
-        //     );
-        // $(".CodeMirror-code div").eq(add_from).after(
-        //   '<div id="hi" style="position: relative;">'+
-        //     '<div class="CodeMirror-gutter-wrapper" style="left: -30px;">'+
-        //       '<div class="CodeMirror-linenumber CodeMirror-gutter-elt" style="left: 0px; width: 21px;">'+add_from+'</div>'+
-        //     '</div>'+
-        //     '<pre class=" CodeMirror-line ">'+
-        //       '<span style="padding-right: 0.1px;">'+
-        //         '<span class="cm-string cm-property">"l1"</span>: '+
-        //         '<span class="cm-keyword">new</span> '+
-        //         '<span class="cm-variable">makerjs</span>.'+
-        //         '<span class="cm-property">paths</span>.'+
-        //         '<span class="cm-property">Line</span>([<span class="cm-number">'+$("#start_x").val()+'</span>, <span class="cm-number">'+$("#start_y").val()+'</span>], [<span class="cm-number">'+$("#end_x").val()+'</span>, <span class="cm-number">'$("#end_x").val()+'</span>]),</span>'+
-        //     '</pre>'+
-        //   '</div>'
-        // );
-        // add_from++;
-        // }
-    </script>
+    
     <script type="text/javascript">
     
         function all_check()
