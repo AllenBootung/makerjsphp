@@ -215,14 +215,14 @@
                 <a name="code"></a>
 
 <pre id="init-javascript-code">
-var makerjs = require('makerjs')
+var makerjs = require('makerjs');
 var model = {
     paths: {
 <?php 
     
     foreach ($row as $key => $value) {
         # code...
-      echo $row[$key]["CODE"];
+      echo "      ". $row[$key]["CODE"]. PHP_EOL;
     }
 
 ?>
