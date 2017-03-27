@@ -10,21 +10,49 @@
     $link->query($sql);
     // print_r($_REQUEST);
 
+
+    function get_last_no ( $primary_key, $table)
+    {
+        global $link;
+        $sql_lastno  = "SELECT ".$primary_key;
+        $sql_lastno .= " FROM ".$table;
+        $sql_lastno .= " ORDER BY ".$primary_key;
+        $sql_lastno .= " DESC LIMIT 1";
+        $result_lastno = $link->query($sql_lastno); 
+        $number = 1;
+        while($row = mysqli_fetch_row($result_lastno))
+        {
+            $number = $row[0]+1;
+            break;
+        } 
+        
+        mysqli_free_result($result_lastno);
+        return $number;
+    }
+
+
     if(isset($_POST["LINE_CONTENT"])){
+        $sn = get_last_no("SN", "code");
         $sql="INSERT INTO code(
-            CODE)
-        VALUES(
-            '".$_POST["LINE_CONTENT"]."')
-        ";
+                     SN ,
+                     CODE )
+                     VALUES(
+                     '".$sn."' ,
+                     '".$_POST["LINE_CONTENT"]."' )
+             ";
 
         $result=$link->query($sql);
     }
+
     if(isset($_POST["CIRCLE_CONTENT"])){
+        $sn = get_last_no("SN", "code");
         $sql="INSERT INTO code(
-            CODE)
-        VALUES(
-            '".$_POST["CIRCLE_CONTENT"]."')
-        ";
+                     SN , 
+                     CODE )
+                     VALUES(
+                     '".$sn."' ,
+                     '".$_POST["CIRCLE_CONTENT"]."' )
+             ";
 
         $result=$link->query($sql);
     }
@@ -38,14 +66,7 @@
     $row=mysqli_fetch_all($result, MYSQLI_ASSOC);
 
 
-    $sql="SELECT SN
-            FROM code
-            ORDER BY SN DESC
-            LIMIT 1
-         ";
-    $result=$link->query($sql);
-    $row_sn=mysqli_fetch_all($result, MYSQLI_ASSOC);
-    $sn = $row_sn[0]["SN"]+1;
+    $sn = get_last_no("SN", "code");
 
 ?>
 
@@ -192,34 +213,35 @@
         <section class="editor row" id="editor">
             <div>
                 <div class="code-header">
-                    <span>
-              JavaScript code editor
-          </span>
+                    <span>JavaScript code editor</span>
                     <button class="run" onclick="MakerJsPlayground.runCodeFromEditor()">&nbsp;&#x25BA; Run</button>
                     <span class="status"></span>
                 </div>
 
                 <a name="code"></a>
 
-                <pre id="init-javascript-code">
-            <?php 
-                echo 'var makerjs = require(\'makerjs\');
-            var model = {
-              paths: {';
-                
-                foreach ($row as $key => $value) {
-                    # code...
-                  echo $row[$key]["CODE"];
-                }
+<pre id="init-javascript-code">
+var makerjs = require('makerjs')
+var model = {
+    paths: {
+<?php 
+    
+    foreach ($row as $key => $value) {
+        # code...
+      echo $row[$key]["CODE"];
+    }
 
+?>
 
-                  echo '}
+    }
 
-            };
-            var svg = makerjs.exporter.toSVG(model);
-            document.write(svg);';
-            ?>
-          </pre>
+};
+if ( !!Object.keys(model.paths).length ) {
+    var svg = makerjs.exporter.toSVG(model);
+    document.write(svg);
+}
+
+</pre>
             </div>
         </section>
         <!-- section class="editor -->
@@ -324,7 +346,7 @@
             $("#btn_addline").hide();
             $("body").removeClass("side-by-side");
 
-            $("#rendering-options-menu").hide();
+            // $("#rendering-options-menu").hide();
         });
         $("iframe").attr("id", "hi");
     </script>
