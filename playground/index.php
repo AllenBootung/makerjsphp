@@ -1,15 +1,9 @@
 <!DOCTYPE html>
 <?php 
 
-    $link = mysqli_connect('localhost',
-                            'root',
-                            '',
-                            'makerjs');
-
+    $link = mysqli_connect('localhost', 'root', '', 'makerjs');
     $sql="SET NAMES UTF8";
     $link->query($sql);
-    // print_r($_REQUEST);
-
 
     function get_last_no ( $primary_key, $table)
     {
