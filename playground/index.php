@@ -24,6 +24,14 @@
         return $number;
     }
 
+    function sql_injection($str) 
+    {
+        global $link;
+        $str = mysqli_real_escape_string($link,$str);
+        $str = htmlspecialchars($str);
+        return $str;
+    }
+
 
     if(isset($_POST["CODE"])){
         $sn = get_last_no("SN", "code");
@@ -33,8 +41,8 @@
                      ELEMENT_NAME )
                      VALUES(
                      '".$sn."' ,
-                     '".$_POST["CODE"]."' ,
-                     '".$_POST["ELEMENT_NAME"]."' )
+                     '".sql_injection($_POST["CODE"])."' ,
+                     '".sql_injection($_POST["ELEMENT_NAME"])."' )
              ";
 
         $result=$link->query($sql);
@@ -136,7 +144,6 @@
           border-color: red;
           border-style: solid;
       }
-      
     }
 </style>
 <body class="no-notes collapse-annotation">
