@@ -4,7 +4,12 @@
     $link = mysqli_connect('localhost', 'root', '', 'makerjs');
     $sql="SET NAMES UTF8";
     $link->query($sql);
-
+    if (isset($_GET["TIME_NUM"])) {
+        $time_num = sql_injection($_GET["TIME_NUM"]);
+    } else {
+        $time_num = time();
+    }
+    echo $time_num;
     function get_last_no ( $primary_key, $table)
     {
         global $link;
@@ -38,32 +43,35 @@
         $sql="INSERT INTO code(
                      SN ,
                      CODE ,
-                     ELEMENT_NAME )
+                     ELEMENT_NAME ,
+                     TIME_NUM )
                      VALUES(
                      '".$sn."' ,
                      '".sql_injection($_POST["CODE"])."' ,
-                     '".sql_injection($_POST["ELEMENT_NAME"])."' )
+                     '".sql_injection($_POST["ELEMENT_NAME"])."' ,
+                     '".$time_num."' )
              ";
-
         $result=$link->query($sql);
     }
 
     if (isset($_POST["DEL"])) {
         $sql = "DELETE FROM code
                  WHERE SN = '".sql_injection($_POST["SN"])."'
-                ";
+                   AND TIME_NUM = '".$time_num."'
+               ";
         $result=$link->query($sql);
-
     }
 
     
 ?>
-<?php
+<?php //印出
+    
     $sql="SELECT SN, CODE, ELEMENT_NAME
             FROM code
+           WHERE TIME_NUM = $time_num 
            ORDER BY SN ASC 
          ";
-    $result=$link->query($sql);
+    $result = $link->query($sql);
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
     echo '<script>var php_element = '. json_encode($row) . ';</script>' ;
 
