@@ -33,7 +33,7 @@
     }
 
 
-    if(isset($_POST["CODE"])){
+    if(isset($_POST["CODE"])) {
         $sn = get_last_no("SN", "code");
         $sql="INSERT INTO code(
                      SN ,
@@ -48,15 +48,24 @@
         $result=$link->query($sql);
     }
 
-   
+    if (isset($_POST["DEL"])) {
+        $sql = "DELETE FROM code
+                 WHERE SN = '".sql_injection($_POST["SN"])."'
+                ";
+        $result=$link->query($sql);
+
+    }
+
     
 ?>
 <?php
-    $sql="SELECT CODE
+    $sql="SELECT SN, CODE, ELEMENT_NAME
             FROM code
+           ORDER BY SN ASC 
          ";
     $result=$link->query($sql);
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    echo '<script>var php_element = '. json_encode($row) . ';</script>' ;
 
     $sn = get_last_no("SN", "code");
 
@@ -161,7 +170,7 @@
                     <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_line" value="直線" /></div>
                     <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_circle" value="圓形" /></div>
                     <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_arc" value="弧形" /></div>
-                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_rec" value="矩形" /></div>
+                    <div class="col-md-1"><input type="button" class="btn btn-md btn-warning" id="btn_del" value="刪除" /></div>
                 </div>
                 <!-- 遊標位置
                 <div class="mouse_position" id="mouse_postition"></div> -->
@@ -206,7 +215,6 @@
                 <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Dxf);">.dxf</button>
                 <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Svg);">.svg</button>
                 <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Json);">json</button>
-                
                 <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Pdf);">.pdf</button>
             </div>
 
@@ -227,9 +235,7 @@
                 <div id="download-preview-container">
                     <textarea id="download-preview" rows="8" readonly></textarea>
                 </div>
-                <!-- <div class="onscreen-help">
-                    If your browser does not support the download button above, <button onclick="MakerJsPlayground.copyToClipboard()">copy the text above</button> and paste into a new text file named <b id="download-filename">myfile.txt</b> on your computer.
-                </div> -->
+                
             </div>
 
         </section>
@@ -332,7 +338,7 @@ if ( !!Object.keys(model.paths).length ) {
         // };
         
     </script>
-    <script>
+    <script>//按鈕
         
         $("#btn_line").click(function(){
             $("#tool_detail").html(
@@ -372,6 +378,21 @@ if ( !!Object.keys(model.paths).length ) {
                 '<input type="submit" class="btn btn-danger" value="增" onclick="return add_arc();"/>'
             );
             
+        });
+
+        $("#btn_del").click(function(){
+            var del_option ="";
+            for (var i in php_element){
+                del_option += '<option value="'+ php_element[i]["SN"]+'">' + php_element[i]["CODE"] + '</option>'
+            }
+
+            $("#tool_detail").html(
+                '<select name="SN" multiple>'+
+                    del_option+
+                '</select>'+
+                '<input type="submit" class="btn btn-danger" value="確定" name="DEL"/>'+
+                '<input type="button" class="btn btn-default" value="取消" onclick="window.location.href = window.location.pathname + window.location.search;"/>'
+            );
         });
 
     </script>
