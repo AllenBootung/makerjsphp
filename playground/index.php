@@ -198,7 +198,41 @@
         <section class="row" id="history" style="width: device-width">
 
         </section>
+        <section id="download">
 
+            <div id="download-select">
+                <h2>請選擇要匯出的格式(尺寸將為mm)</h2>
+
+                <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Dxf);">.dxf</button>
+                <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Svg);">.svg</button>
+                <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Json);">json</button>
+                
+                <button href="#" onclick="MakerJsPlayground.downloadClick(this, MakerJsPlaygroundExport.ExportFormat.Pdf);">.pdf</button>
+            </div>
+
+            <div id="download-generating">
+                <h2>計算中...</h2>
+
+                <button onclick="MakerJsPlayground.cancelExport()">消</button>
+                <div id="download-progress"></div>
+            </div>
+
+            <div id="download-ready">
+                <h2>計算完畢，點此下載↓</h2>
+
+                <span id="download-link-container"></span>
+                <span>
+                    <button class="close" onclick="MakerJsPlayground.toggleClass('download-ready')">close</button>
+                </span>
+                <div id="download-preview-container">
+                    <textarea id="download-preview" rows="8" readonly></textarea>
+                </div>
+                <!-- <div class="onscreen-help">
+                    If your browser does not support the download button above, <button onclick="MakerJsPlayground.copyToClipboard()">copy the text above</button> and paste into a new text file named <b id="download-filename">myfile.txt</b> on your computer.
+                </div> -->
+            </div>
+
+        </section>
         <section class="editor row" id="editor">
             <div>
                 <div class="code-header">
@@ -244,56 +278,11 @@ if ( !!Object.keys(model.paths).length ) {
 
     </main>
 
-    <script>
+
+    <script>//新增元素
         var growbal = growbal || {};
         growbal.SN = <?php echo $sn;?>;
 
-        $("#btn_line").click(function(){
-            $("#tool_detail").html(
-                '<div class="line">'+
-                    '<div class="row "> 原點 X<input id="start_x" /> Y<input id="start_y" /></div>'+
-                    '<div class="row "> 終點 X<input id="end_x" /> Y<input id="end_y" /></div>'+
-                    '<input type="hidden" id="CODE" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="直線"/>'+
-                '</div>'+
-                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_line();"/>'
-            );
-            
-        });
-
-        $("#btn_circle").click(function(){
-            $("#tool_detail").html(
-                '<div class="circle">'+
-                    '<div class="row "> 原點 X<input id="c_start_x" /> Y<input id="c_start_y" /></div>'+
-                    '<div class="row "> 半徑 R<input id="radius" /></div>'+
-                    '<input type="hidden" id="CODE" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="圓"/>'+
-                '</div>'+
-                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_circle();"/>'  
-            );
-            
-        });
-
-        $("#btn_arc").click(function(){
-            $("#tool_detail").html(
-                '<div class="arc">'+
-                    '<div class="row "> 原點 X<input id="arc_start_x" /> Y<input id="arc_start_y" /></div>'+
-                    '<div class="row "> 半徑 R<input id="arc_radius" /></div>'+
-                    '<div class="row "> 起始角<input id="arc_r_start" /> 結束角<input id="arc_r_end" /></div>'+
-                    '<input type="hidden" id="CODE" name="CODE" />'+
-                    '<input type="hidden" name="ELEMENT_NAME" value="弧"/>'+
-                '</div>'+
-                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_arc();"/>'
-            );
-            
-        });
-
-    </script>
-    
-    <script>//新增元素
-        
-        
-        
         function add_line()
         {
             
@@ -342,7 +331,49 @@ if ( !!Object.keys(model.paths).length ) {
         //     return true;
         // };
         
+    </script>
+    <script>
         
+        $("#btn_line").click(function(){
+            $("#tool_detail").html(
+                '<div class="line">'+
+                    '<div class="row "> 原點 X<input id="start_x" /> Y<input id="start_y" /></div>'+
+                    '<div class="row "> 終點 X<input id="end_x" /> Y<input id="end_y" /></div>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="直線"/>'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_line();"/>'
+            );
+            
+        });
+
+        $("#btn_circle").click(function(){
+            $("#tool_detail").html(
+                '<div class="circle">'+
+                    '<div class="row "> 原點 X<input id="c_start_x" /> Y<input id="c_start_y" /></div>'+
+                    '<div class="row "> 半徑 R<input id="radius" /></div>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="圓"/>'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_circle();"/>'  
+            );
+            
+        });
+
+        $("#btn_arc").click(function(){
+            $("#tool_detail").html(
+                '<div class="arc">'+
+                    '<div class="row "> 原點 X<input id="arc_start_x" /> Y<input id="arc_start_y" /></div>'+
+                    '<div class="row "> 半徑 R<input id="arc_radius" /></div>'+
+                    '<div class="row "> 起始角<input id="arc_r_start" /> 結束角<input id="arc_r_end" /></div>'+
+                    '<input type="hidden" id="CODE" name="CODE" />'+
+                    '<input type="hidden" name="ELEMENT_NAME" value="弧"/>'+
+                '</div>'+
+                '<input type="submit" class="btn btn-danger" value="增" onclick="return add_arc();"/>'
+            );
+            
+        });
+
     </script>
     
     <script type="text/javascript">
@@ -354,7 +385,6 @@ if ( !!Object.keys(model.paths).length ) {
     </script>
     
     <script type="text/javascript">
-    
         function all_check()
         {
             allfill = true;
