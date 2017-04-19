@@ -4,12 +4,12 @@
     $link = mysqli_connect('localhost', 'root', '', 'makerjs');
     $sql="SET NAMES UTF8";
     $link->query($sql);
-    if (isset($_GET["TIME_NUM"])) {
-        $time_num = sql_injection($_GET["TIME_NUM"]);
+    if (isset($_GET["TIME_NO"])) {
+        $time_no = sql_injection($_GET["TIME_NO"]);
     } else {
-        $time_num = time();
+        $time_no = date("Y-m-d h:i:s");
     }
-    echo $time_num;
+    
     function get_last_no ( $primary_key, $table)
     {
         global $link;
@@ -44,12 +44,12 @@
                      SN ,
                      CODE ,
                      ELEMENT_NAME ,
-                     TIME_NUM )
+                     TIME_NO )
                      VALUES(
                      '".$sn."' ,
                      '".sql_injection($_POST["CODE"])."' ,
                      '".sql_injection($_POST["ELEMENT_NAME"])."' ,
-                     '".$time_num."' )
+                     '".$time_no."' )
              ";
         $result=$link->query($sql);
     }
@@ -57,7 +57,7 @@
     if (isset($_POST["DEL"])) {
         $sql = "DELETE FROM code
                  WHERE SN = '".sql_injection($_POST["SN"])."'
-                   AND TIME_NUM = '".$time_num."'
+                   AND TIME_NO = '".$time_no."'
                ";
         $result=$link->query($sql);
     }
@@ -68,13 +68,13 @@
     
     $sql="SELECT SN, CODE, ELEMENT_NAME
             FROM code
-           WHERE TIME_NUM = $time_num 
+           WHERE TIME_NO = '".$time_no."'
            ORDER BY SN ASC 
          ";
     $result = $link->query($sql);
     $row = mysqli_fetch_all($result, MYSQLI_ASSOC);
     echo '<script>var php_element = '. json_encode($row) . ';</script>' ;
-
+    
     $sn = get_last_no("SN", "code");
 
 ?>
@@ -169,7 +169,8 @@
     <main class="row">
         <header class="logo row">
 
-            <form method="POST">
+            <form method="POST" action="index.php?TIME_NO=<?php echo $time_no;?>">
+                <input type="hidden" name="TIME_NO" value="<?php echo $time_no;?>">
                 <div id="rendering-options-top">
                     <button onclick="MakerJsPlayground.toggleClassAndResize('collapse-rendering-options');">自訂 <span class="icon dropup">&#x25B4;</span><span class="icon dropdown">&#x25BE;</span></button>
                 </div>
@@ -229,7 +230,7 @@
             <div id="download-generating">
                 <h2>計算中...</h2>
 
-                <button onclick="MakerJsPlayground.cancelExport()">消</button>
+                <button onclick="MakerJsPlayground.cancelExport()">取消</button>
                 <div id="download-progress"></div>
             </div>
 
@@ -333,17 +334,7 @@ if ( !!Object.keys(model.paths).length ) {
             return all_check();
         };
         
-        // function add_rec()
-        // {
-            
-        //     $("#CODE").val(
-        //         '"C'+ growbal.SN +'": new makerjs.paths.Circle(['+  $("#c_start_x").val() +','+ $("#c_start_y").val()+'], '+
-        //         $("#radius").val()+' ),'
-        //     );
-        //     $("#CIRCLE_CONTENT").removeAttr("disabled");
-
-        //     return true;
-        // };
+   
         
     </script>
     <script>//按鈕
